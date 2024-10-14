@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess
 import configparser
 from faster_whisper import WhisperModel
@@ -346,6 +347,15 @@ translate_to = st.selectbox("Choose the language to translate", ['ru','en','de',
 model_size = st.selectbox("Model Size", model_sizes, index=model_sizes.index("tiny"))
 # translate_to = st.selectbox("Choose the language to translate", ['ru','en','de','uz', None], index=4)
 
+# Asking the user if they want a delay
+want_delay = st.radio("Do you want a delay?", ("Yes", "No"), index=1)
+
+# If the user wants a delay, ask for the number of seconds
+if want_delay == "Yes":
+    delay_seconds = st.number_input("How many seconds of delay?", min_value=0, step=1)
+
+
+
 # text_chunk_size = st.number_input("Text Chunk Size", value=text_chunk_size)
 # max_chunk = st.number_input("Max Chunk", value=max_chunk)
 
@@ -405,7 +415,18 @@ if uploaded_file is not None:
             if translate_to is None:
                 # Command without the second subtitle
                 command = f'ffmpeg -y -i "{save_path}" -vf "subtitles=\'{subtitle_file}\':force_style=\'Alignment=2\'" -c:a copy "{save_path}.mp4"'
+            
+            if want_delay:
+                delay_command = f'ffmpeg -y -itsoffset {delay_seconds} -i {subtitle_file} -c copy {subtitle_file}.srt'
+                os.system(delay_command)
+                shutil.move(f'{subtitle_file}.srt', subtitle_file)
 
+                if translate_to != None:
+                    delay_command = f'ffmpeg -y -itsoffset {delay_seconds} -i {subtitle_file2} -c copy {subtitle_file2}.srt'
+                    os.system(delay_command)
+                    shutil.move(f'{subtitle_file2}.srt', subtitle_file2)
+
+            print(command)
             os.system(command)
 
             st.success("Video with subtitles generated!")
