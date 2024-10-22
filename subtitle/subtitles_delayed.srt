@@ -1,0 +1,8 @@
+1
+00:00:02,620 --> 00:00:08,620
+I have no idea why Audacity is removing part of my speech.
+
+2
+00:00:08,620 --> 00:00:12,120
+Maybe that detection is not working well, who knows.
+
